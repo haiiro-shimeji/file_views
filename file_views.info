@@ -1,0 +1,7 @@
+name = file_views
+description = file system views.
+package = VIEWS
+version = 7.x-0.x
+core = 7.x
+files[] = file_views.test
+files[] = views_plugin_file_views_query.inc

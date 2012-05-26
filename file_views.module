@@ -1,0 +1,101 @@
+<?php
+
+/**
+ * Implements hook_views_plugins
+ */
+function file_views_views_plugins() {
+	return array(
+		'module' => 'file_views',
+		'query' => array(
+			'file_views' => array(
+				'title' => t('file_views'),
+				'help' => t(''),
+				'handler' => 'views_plugin_file_views_query',
+		        'path' => drupal_get_path('module', 'file_views'),
+				'base' => array('file_views'), // only works with 'comment' as base.
+				'uses options' => TRUE,
+				'type' => 'normal',
+				'help topic' => 'style-comment',
+			),
+		),
+	);
+}
+
+function file_views_views_data() {
+
+	return array(
+		'file_views' => array(
+			'table' => array(
+				'group' => 'file_views',
+				'title' => 'dummy table',
+				'help' => '',
+				'base' => array(
+					'title' => t('file_view'),
+					'help' => t("file_view."),
+					'weight' => -10,
+					'query class' => 'file_views'
+				)
+			),
+			'name' => array(
+				'title' => t('name'),
+				'help' => t('The directory name.'),
+				'field' => array(
+					'handler' => 'views_handler_field',
+					'click sortable' => TRUE,
+				),
+				'argument' => array(
+					'handler' => 'views_handler_argument',
+					'name field' => 'name', // the field to display in the summary.
+				),
+				// Information for accepting a nid as a filter
+				'filter' => array(
+					'handler' => 'views_handler_filter',
+				),
+				// Information for sorting on a nid.
+				'sort' => array(
+					'handler' => 'views_handler_sort',
+				),
+			),
+			'path' => array(
+				'title' => t('path'),
+				'help' => t('The directory path.'),
+				'field' => array(
+					'handler' => 'views_handler_field',
+					'click sortable' => TRUE,
+				),
+				'argument' => array(
+					'handler' => 'views_handler_argument',
+					'name field' => 'name', // the field to display in the summary.
+				),
+				// Information for accepting a nid as a filter
+				'filter' => array(
+					'handler' => 'views_handler_filter',
+				),
+				// Information for sorting on a nid.
+				'sort' => array(
+					'handler' => 'views_handler_sort',
+				),
+			),
+			'modified' => array(
+				'title' => t('modified'),
+				'help' => t('The time last modified.'),
+				'field' => array(
+					'handler' => 'views_handler_field',
+					'click sortable' => TRUE,
+				),
+				'argument' => array(
+					'handler' => 'views_handler_argument',
+					'name field' => 'date', // the field to display in the summary.
+				),
+				// Information for accepting a nid as a filter
+				'filter' => array(
+					'handler' => 'views_handler_filter',
+				),
+				// Information for sorting on a nid.
+				'sort' => array(
+					'handler' => 'views_handler_sort',
+				),
+			),
+		)
+	);
+}
