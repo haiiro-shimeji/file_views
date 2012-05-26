@@ -30,8 +30,8 @@ function file_views_views_data() {
 				'title' => 'dummy table',
 				'help' => '',
 				'base' => array(
-					'title' => t('file_view'),
-					'help' => t("file_view."),
+					'title' => t('file_views'),
+					'help' => t("file_views."),
 					'weight' => -10,
 					'query class' => 'file_views'
 				)

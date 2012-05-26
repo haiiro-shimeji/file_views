@@ -1,162 +1,89 @@
 <?php
 
 class views_plugin_file_views_query extends views_plugin_query {
-  /**
-   * A pager plugin that should be provided by the display.
-   */
-  var $pager = NULL;
 
-  /**
-   * Constructor; Create the basic query object and fill with default values.
-   */
-  function init($base_table, $base_field, $options) {
-	  $hoge = "hoge";
-  }
+	/**
+	 * A pager plugin that should be provided by the display.
+	 */
+	var $pager = NULL;
 
-  /**
-   * Generate a query and a countquery from all of the information supplied
-   * to the object.
-   *
-   * @param $get_count
-   *   Provide a countquery if this is true, otherwise provide a normal query.
-   */
-  function query($get_count = FALSE) { }
+	//function init($base_table, $base_field, $options) {}	//@see view_plugin_query()
 
-  /**
-   * Let modules modify the query just prior to finalizing it.
-   *
-   * @param view $view
-   *   The view which is executed.
-   */
-  function alter(&$view) {  }
+	function query($get_count = FALSE) {}
 
-  /**
-   * Builds the necessary info to execute the query.
-   *
-   * @param view $view
-   *   The view which is executed.
-   */
-  function build(&$view) { }
+	function alter(&$view) {}
 
-  /**
-   * Executes the query and fills the associated view object with according
-   * values.
-   *
-   * Values to set: $view->result, $view->total_rows, $view->execute_time,
-   * $view->pager['current_page'].
-   *
-   * $view->result should contain an array of objects.
-   *
-   * @param view $view
-   *   The view which is executed.
-   */
-  function execute(&$view) {  }
+	function build(&$view) {}
 
-  function add_field($table, $field, $alias = '', $params = array()) {}
-  
-  /**
-   * Add a signature to the query, if such a thing is feasible.
-   *
-   * This signature is something that can be used when perusing query logs to
-   * discern where particular queries might be coming from.
-   *
-   * @param view $view
-   *   The view which is executed.
-   */
-  function add_signature(&$view) { }
+	function execute(&$view) {
+		
+		$view->result[] = (Object)array(
+			'file_views_name' => 'hoge',
+			'file_views_path' => 'hoge/fuga',
+			'file_views_modified' => 1000,
+		);
+		
+	}
 
-  /**
-   * Get aggregation info for group by queries.
-   *
-   * If NULL, aggregation is not allowed.
-   */
-  function get_aggregation_info() { }
+	function add_field($table, $field, $alias = '', $params = array()) {
+		return 'file_views_'.$field;
+	}
 
-  /**
-   * Add settings for the ui.
-   */
-  function options_form(&$form, &$form_state) {
-    parent::options_form($form, $form_state);
-  }
+	function add_signature(&$view) {}
 
-  function options_validate(&$form, &$form_state) { }
+	function get_aggregation_info() {}
 
-  function options_submit(&$form, &$form_state) { }
+	function options_form(&$form, &$form_state) {
+		parent::options_form($form, $form_state);
+	}
 
-  function summary_title() {
-    return t('Settings');
-  }
+	function options_validate(&$form, &$form_state) {}
 
-  /**
-   * Set a LIMIT on the query, specifying a maximum number of results.
-   */
-  function set_limit($limit) {
-    $this->limit = $limit;
-  }
+	function options_submit(&$form, &$form_state) {}
 
-  /**
-   * Set an OFFSET on the query, specifying a number of results to skip
-   */
-  function set_offset($offset) {
-    $this->offset = $offset;
-  }
+	function summary_title() {
+		return t('Settings');
+	}
 
-  /**
-   * Render the pager, if necessary.
-   */
-  function render_pager($exposed_input) {
-    if (!empty($this->pager) && $this->pager->use_pager()) {
-      return $this->pager->render($exposed_input);
-    }
+	function set_limit($limit) {
+		$this->limit = $limit;
+	}
 
-    return '';
-  }
+	function set_offset($offset) {
+		$this->offset = $offset;
+	}
 
-  /**
-   * Create a new grouping for the WHERE or HAVING clause.
-   *
-   * @param $type
-   *   Either 'AND' or 'OR'. All items within this group will be added
-   *   to the WHERE clause with this logical operator.
-   * @param $group
-   *   An ID to use for this group. If unspecified, an ID will be generated.
-   * @param $where
-   *   'where' or 'having'.
-   *
-   * @return $group
-   *   The group ID generated.
-   */
-  function set_where_group($type = 'AND', $group = NULL, $where = 'where') {
-    // Set an alias.
-    $groups = &$this->$where;
+	function render_pager($exposed_input) {
+		if (!empty($this->pager) && $this->pager->use_pager()) {
+			return $this->pager->render($exposed_input);
+		}
 
-    if (!isset($group)) {
-      $group = empty($groups) ? 1 : max(array_keys($groups)) + 1;
-    }
+		return '';
+	}
 
-    // Create an empty group
-    if (empty($groups[$group])) {
-      $groups[$group] = array('conditions' => array(), 'args' => array());
-    }
+	function set_where_group($type = 'AND', $group = NULL, $where = 'where') {
+		// Set an alias.
+		$groups = &$this->$where;
 
-    $groups[$group]['type'] = strtoupper($type);
-    return $group;
-  }
+		if (!isset($group)) {
+			$group = empty($groups) ? 1 : max(array_keys($groups)) + 1;
+		}
 
-  /**
-   * Control how all WHERE and HAVING groups are put together.
-   *
-   * @param $type
-   *   Either 'AND' or 'OR'
-   */
-  function set_group_operator($type = 'AND') {
-    $this->group_operator = strtoupper($type);
-  }
+		// Create an empty group
+		if (empty($groups[$group])) {
+			$groups[$group] = array('conditions' => array(), 'args' => array());
+		}
 
-  /**
-   * Returns the according entity objects for the given query results.
-   */
-  function get_result_entities($results, $relationship = NULL) {
-    return FALSE;
-  }
+		$groups[$group]['type'] = strtoupper($type);
+		return $group;
+	}
+
+	function set_group_operator($type = 'AND') {
+		$this->group_operator = strtoupper($type);
+	}
+
+	function get_result_entities($results, $relationship = NULL) {
+		return FALSE;
+	}
+
 }
