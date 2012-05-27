@@ -13,15 +13,51 @@ class views_plugin_file_views_query extends views_plugin_query {
 
 	function alter(&$view) {}
 
-	function build(&$view) {}
+	function build(&$view) {
+		
+		// Make the query distinct if the option was set.
+		if (!empty($this->options['distinct'])) {
+		$this->set_distinct();
+		}
+
+		// Store the view in the object to be able to use it later.
+		$this->view = $view;
+
+		$view->init_pager();
+
+		// Let the pager modify the query to add limits.
+		$this->pager->query();
+
+		$view->build_info['query'] = $this->query();
+		$view->build_info['count_query'] = $this->query(TRUE);
+		
+	}
 
 	function execute(&$view) {
 		
-		$view->result[] = (Object)array(
-			'file_views_name' => 'hoge',
-			'file_views_path' => 'hoge/fuga',
-			'file_views_modified' => 1000,
-		);
+		$result = array();
+		
+		$dir = preg_replace( '%/$%', '', implode('/', $view->args) );
+		$real_path = '/var/data'.$dir;
+		
+		if (( $handle = opendir('/var/data/'.$dir))) {
+
+			while (false !== ($entry = readdir($handle))) {
+				
+				if ( '.' == $entry or '..' == $entry ) continue;
+				
+				$result[] = (Object)array(
+					'file_views_name' => $entry,
+					'file_views_path' => $dir.'/'.$entry,
+					'file_views_type' => ( is_dir( $real_path ) ? 'd' : 'f' ),
+					'file_views_modified' => 1000,
+				);
+				
+			}
+			
+		}
+		
+		$view->result = array_slice($result, $this->offset, $this->limit);
 		
 	}
 

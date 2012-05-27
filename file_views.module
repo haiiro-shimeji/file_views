@@ -12,7 +12,7 @@ function file_views_views_plugins() {
 				'help' => t(''),
 				'handler' => 'views_plugin_file_views_query',
 		        'path' => drupal_get_path('module', 'file_views'),
-				'base' => array('file_views'), // only works with 'comment' as base.
+				'base' => array('file_views'),
 				'uses options' => TRUE,
 				'type' => 'normal',
 				'help topic' => 'style-comment',
@@ -59,6 +59,26 @@ function file_views_views_data() {
 			'path' => array(
 				'title' => t('path'),
 				'help' => t('The directory path.'),
+				'field' => array(
+					'handler' => 'views_handler_field',
+					'click sortable' => TRUE,
+				),
+				'argument' => array(
+					'handler' => 'views_handler_argument',
+					'name field' => 'name', // the field to display in the summary.
+				),
+				// Information for accepting a nid as a filter
+				'filter' => array(
+					'handler' => 'views_handler_filter',
+				),
+				// Information for sorting on a nid.
+				'sort' => array(
+					'handler' => 'views_handler_sort',
+				),
+			),
+			'type' => array(
+				'title' => t('type'),
+				'help' => t('file(f) or directory(d).'),
 				'field' => array(
 					'handler' => 'views_handler_field',
 					'click sortable' => TRUE,
