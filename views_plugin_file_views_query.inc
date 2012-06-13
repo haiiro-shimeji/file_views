@@ -61,6 +61,14 @@ class views_plugin_file_views_query extends views_plugin_query {
 
 			}
 
+			$this->pager->total_items = count($result);
+			$this->pager->total_items -= $this->offset;
+			
+		    $this->pager->update_page_info();
+			
+			// Let the pager modify the query to add limits.
+			$this->pager->pre_execute($query);
+
 			$view->result = array_slice($result, $this->offset, $this->limit);
 			
 			usort( $view->result,
@@ -72,6 +80,12 @@ class views_plugin_file_views_query extends views_plugin_query {
 					);
 				} 
 			);
+			
+			$this->pager->post_execute($view->result);
+
+			if ($this->pager->use_pager()) {
+			$view->total_rows = $this->pager->get_total_items();
+			}
 			
 		}
 		
