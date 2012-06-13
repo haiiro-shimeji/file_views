@@ -62,7 +62,9 @@ class views_plugin_file_views_query extends views_plugin_query {
 			}
 
 			$this->pager->total_items = count($result);
-			$this->pager->total_items -= $this->offset;
+			if (!empty($this->pager->options['offset'])) {
+				$this->pager->total_items -= $this->offset;
+			}
 			
 		    $this->pager->update_page_info();
 			
