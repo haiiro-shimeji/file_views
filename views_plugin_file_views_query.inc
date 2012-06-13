@@ -39,7 +39,7 @@ class views_plugin_file_views_query extends views_plugin_query {
 		
 			$result = array();
 
-			$dir = preg_replace( '%/$%', '', implode('/', $view->args) );
+			$dir = preg_replace( '%..%', '', preg_replace( '%/$%', '', implode('/', $view->args) ) );
 			$real_path = $root_dir.'/'.$dir;
 
 			if (( $handle = opendir($real_path))) {
