@@ -63,10 +63,20 @@ class views_plugin_file_views_query extends views_plugin_query {
 
 			$view->result = array_slice($result, $this->offset, $this->limit);
 			
+			usort( $view->result,
+				function( $a, $b ) {
+					return ( $a->file_views_name == $b->file_views_name 
+							? 0
+							: ( $a->file_views_name < $b->file_views_name 
+								? -1 : 1 ) 
+					);
+				} 
+			);
+			
 		}
 		
 	}
-
+	
 	function add_field($table, $field, $alias = '', $params = array()) {
 		return 'file_views_'.$field;
 	}
