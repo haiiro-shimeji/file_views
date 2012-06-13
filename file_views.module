@@ -119,3 +119,33 @@ function file_views_views_data() {
 		)
 	);
 }
+
+/**
+ * Implementation of hook_menu().
+ */
+function file_views_menu() {
+  
+  $items['admin/config/services/file_views'] = array(
+    'title' => 'File Views',
+    'description' => 'Configure File Views settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('file_views_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+  
+}
+
+function file_views_admin_settings($form) {
+  
+  $form['file_views_path'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Path',
+    '#default_value' => variable_get('file_views_path', ''),
+    '#description' => 'Directory path to display with file_views views.',
+  );
+  
+  return system_settings_form($form);
+    
+}

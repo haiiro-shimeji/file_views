@@ -35,29 +35,35 @@ class views_plugin_file_views_query extends views_plugin_query {
 
 	function execute(&$view) {
 		
-		$result = array();
+		if ( $root_dir = preg_replace( '%/$%', '', variable_get('file_views_path', '') ) ) {
 		
-		$dir = preg_replace( '%/$%', '', implode('/', $view->args) );
-		$real_path = '/var/data/'.$dir;
-		
-		if (( $handle = opendir('/var/data/'.$dir))) {
+			$result = array();
 
-			while (false !== ($entry = readdir($handle))) {
-				
-				if ( '.' == $entry or '..' == $entry ) continue;
-				
-				$result[] = (Object)array(
-					'file_views_name' => $entry,
-					'file_views_type' => ( is_dir( $real_path.'/'.$entry ) ? 'd' : 'f' ),
-					'file_views_path' => $dir.'/'.$entry.( is_dir( $real_path.'/'.$entry ) ? '/' : ''),
-					'file_views_modified' => 1000,
-				);
-				
+			$dir = preg_replace( '%/$%', '', implode('/', $view->args) );
+			$real_path = $root_dir.'/'.$dir;
+
+			if (( $handle = opendir($real_path))) {
+
+				while (false !== ($entry = readdir($handle))) {
+
+					if ( '.' == $entry or '..' == $entry ) continue;
+					
+					$entry_real_path = $real_path.'/'.$entry;
+
+					$result[] = (Object)array(
+						'file_views_name' => $entry,
+						'file_views_type' => ( is_dir( $entry_real_path ) ? 'd' : 'f' ),
+						'file_views_path' => $dir.'/'.$entry.( is_dir( $entry_real_path ) ? '/' : ''),
+						'file_views_modified' => 1000,
+					);
+
+				}
+
 			}
+
+			$view->result = array_slice($result, $this->offset, $this->limit);
 			
 		}
-		
-		$view->result = array_slice($result, $this->offset, $this->limit);
 		
 	}
 
