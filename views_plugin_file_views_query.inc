@@ -38,7 +38,7 @@ class views_plugin_file_views_query extends views_plugin_query {
 		$result = array();
 		
 		$dir = preg_replace( '%/$%', '', implode('/', $view->args) );
-		$real_path = '/var/data'.$dir;
+		$real_path = '/var/data/'.$dir;
 		
 		if (( $handle = opendir('/var/data/'.$dir))) {
 
@@ -48,8 +48,8 @@ class views_plugin_file_views_query extends views_plugin_query {
 				
 				$result[] = (Object)array(
 					'file_views_name' => $entry,
-					'file_views_path' => $dir.'/'.$entry,
-					'file_views_type' => ( is_dir( $real_path ) ? 'd' : 'f' ),
+					'file_views_type' => ( is_dir( $real_path.'/'.$entry ) ? 'd' : 'f' ),
+					'file_views_path' => $dir.'/'.$entry.( is_dir( $real_path.'/'.$entry ) ? '/' : ''),
 					'file_views_modified' => 1000,
 				);
 				
