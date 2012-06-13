@@ -69,7 +69,7 @@ class views_plugin_file_views_query extends views_plugin_query {
 			// Let the pager modify the query to add limits.
 			$this->pager->pre_execute($query);
 
-			$view->result = array_slice($result, $this->offset, $this->limit);
+			$view->result = array_slice($result, $this->offset, ( 0 == $this->limit ? null : $this->limit ) );
 			
 			usort( $view->result,
 				function( $a, $b ) {
