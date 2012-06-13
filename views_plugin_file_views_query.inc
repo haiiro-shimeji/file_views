@@ -46,7 +46,7 @@ class views_plugin_file_views_query extends views_plugin_query {
 
 				while (false !== ($entry = readdir($handle))) {
 
-					if ( '.' == $entry or '..' == $entry ) continue;
+					if ( preg_match( '%^\.%', $entry ) ) continue;
 					
 					$entry_real_path = $real_path.'/'.$entry;
 
