@@ -80,6 +80,38 @@ class views_plugin_file_views_query_test extends DrupalUnitTestCase {
 		
 	}
 	
+	function testExecute_limit0() {
+		
+		$OFFSET = 1;
+		$LIMIT = 0;
+		
+		$RESULTS = array(
+			(Object)array( "file_views_name" => "bbb" ),
+			(Object)array( "file_views_name" => "aaa" ),
+			(Object)array( "file_views_name" => "ddd" ),
+			(Object)array( "file_views_name" => "ccc" ),
+		);
+		
+		$PAGER = new Mock_pager_for_testExecute;
+		
+		$query = new Mock_view_plugin_file_views_query_for_testExecute( 
+			$RESULTS,
+			$OFFSET,
+			$LIMIT
+		);
+		
+		$VIEW = new Mock_view_for_testExecute( $query, $PAGER );
+
+		$query->execute( $VIEW );
+		
+		//	when $query->limit is 0, $view->result is sliced from $query->offset to the end.
+		$this->assertEqual( 3, count( $VIEW->result ) );
+		$this->assertEqual( $RESULTS[0], $VIEW->result[0] );
+		$this->assertEqual( $RESULTS[3], $VIEW->result[1] );
+		$this->assertEqual( $RESULTS[2], $VIEW->result[2] );
+		
+	}
+	
 }
 
 class Mock_view_for_testBuild extends view {
