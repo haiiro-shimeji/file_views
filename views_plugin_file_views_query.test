@@ -20,7 +20,7 @@ class views_plugin_file_views_query_test extends DrupalUnitTestCase {
 		
 		$query = new views_plugin_file_views_query;
 		
-		$views = new Mock_views_for_testBuild( new Mock_pager_for_testBuild );
+		$views = new Mock_view_for_testBuild( new Mock_pager_for_testBuild );
 		$views->query = $query;
 		
 		$query->build($views);
@@ -51,13 +51,13 @@ class views_plugin_file_views_query_test extends DrupalUnitTestCase {
 		
 		$PAGER = new Mock_pager_for_testExecute;
 		
-		$query = new Mock_views_plugin_file_views_query_for_testExecute( 
+		$query = new Mock_view_plugin_file_views_query_for_testExecute( 
 			$RESULTS,
 			$OFFSET,
 			$LIMIT
 		);
 		
-		$VIEW = new Mock_views_for_testExecute( $query, $PAGER );
+		$VIEW = new Mock_view_for_testExecute( $query, $PAGER );
 
 		$query->execute( $VIEW );
 		
@@ -107,7 +107,7 @@ class views_plugin_file_views_query_test extends DrupalUnitTestCase {
 
 }
 
-class Mock_views_for_testBuild extends view {
+class Mock_view_for_testBuild extends view {
 	
 	var $processed = array();
 	
@@ -149,7 +149,7 @@ class Mock_pager_for_testBuild extends views_plugin_pager {
 	
 }
 
-class Mock_views_plugin_file_views_query_for_testExecute extends views_plugin_file_views_query {
+class Mock_view_plugin_file_views_query_for_testExecute extends views_plugin_file_views_query {
 
 	var $results;
 	
@@ -165,7 +165,7 @@ class Mock_views_plugin_file_views_query_for_testExecute extends views_plugin_fi
 	
 }
 
-class Mock_views_for_testExecute extends view {
+class Mock_view_for_testExecute extends view {
 	
 	var $processed = array();
 	
