@@ -130,19 +130,6 @@ class views_plugin_file_views_query extends views_plugin_query {
 	}
 
 	function set_where_group($type = 'AND', $group = NULL, $where = 'where') {
-		// Set an alias.
-		$groups = &$this->$where;
-
-		if (!isset($group)) {
-			$group = empty($groups) ? 1 : max(array_keys($groups)) + 1;
-		}
-
-		// Create an empty group
-		if (empty($groups[$group])) {
-			$groups[$group] = array('conditions' => array(), 'args' => array());
-		}
-
-		$groups[$group]['type'] = strtoupper($type);
 		return $group;
 	}
 
