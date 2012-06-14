@@ -13,6 +13,9 @@ class views_plugin_file_views_query_test extends DrupalUnitTestCase {
 		);
 	}
 	
+	/**
+	 * build() should have some side effects. 
+	 */
 	function testBuild() {
 		
 		$query = new views_plugin_file_views_query;
@@ -30,7 +33,10 @@ class views_plugin_file_views_query_test extends DrupalUnitTestCase {
 		$this->assert( $views->verify() );
 		
 	}
-		
+	
+	/**
+	 * execute() should have some side effects. 
+	 */
 	function testExecute() {
 		
 		$OFFSET = 1;
@@ -71,6 +77,31 @@ class views_plugin_file_views_query_test extends DrupalUnitTestCase {
 		$this->assertEqual( $RESULTS[3], $VIEW->result[1] );
 		
 		//	when $query->limit is 0, $view->result is sliced from $query->offset to the end.
+		
+	}
+	
+	/**
+	 * Some functions must be implemented.
+	 * 
+	 * @note
+	 * but these are not defined by super class.
+	 * 
+	 */
+	function testImplement() {
+		
+		$query = new views_plugin_file_views_query;
+		
+		$this->assert( method_exists( $query, "query" ) );
+		$this->assert( method_exists( $query, "add_field" ) );
+		$this->assert( method_exists( $query, "add_signature" ) );
+		$this->assert( method_exists( $query, "options_form" ) );
+		$this->assert( method_exists( $query, "options_validate" ) );
+		$this->assert( method_exists( $query, "options_submit" ) );
+		$this->assert( method_exists( $query, "set_limit" ) );
+		$this->assert( method_exists( $query, "set_offset" ) );
+		$this->assert( method_exists( $query, "render_pager" ) );
+		$this->assert( method_exists( $query, "set_group_operator" ) );
+		$this->assert( method_exists( $query, "get_result_entities" ) );
 		
 	}
 
