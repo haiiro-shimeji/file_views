@@ -18,7 +18,7 @@ abstract class views_plugin_external_query extends views_plugin_query {
 	 */
 	abstract protected function getResults();
 	
-	abstract protected function add_field($table, $field, $alias = '', $params = array());
+	abstract protected function _add_field($table, $field, $alias = '', $params = array());
 	
 	/**
 	 * Default compare function used by usort(). 
@@ -61,6 +61,10 @@ abstract class views_plugin_external_query extends views_plugin_query {
 		
 	}
 	
+	function add_field($table, $field, $alias = '', $params = array()) {
+		return $this->_add_field($table, $field, $alias, $params);
+	}
+	
 }
 
 class views_plugin_file_views_query extends views_plugin_external_query {
@@ -101,7 +105,7 @@ class views_plugin_file_views_query extends views_plugin_external_query {
 
 	}
 
-	protected function add_field($table, $field, $alias = '', $params = array()) {
+	protected function _add_field($table, $field, $alias = '', $params = array()) {
 		return 'file_views_'.$field;
 	}
 	
