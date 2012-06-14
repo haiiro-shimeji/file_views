@@ -1,18 +1,30 @@
 <?php
 
-class views_plugin_file_views_query extends views_plugin_query {
+/**
+ * Views query plugin that take the extenal data instead of fetch from database.
+ * 
+ */
+abstract class views_plugin_external_query extends views_plugin_query {
 
 	/**
 	 * A pager plugin that should be provided by the display.
 	 */
 	var $pager = NULL;
 
-	//function init($base_table, $base_field, $options) {}	//@see view_plugin_query()
-
-	function query($get_count = FALSE) {}
-
-	function alter(&$view) {}
-
+	/**
+	 * Returns datas.
+	 * 
+	 * @return array of object result data. 
+	 */
+	abstract protected function getResults();
+	
+	abstract protected function add_field($table, $field, $alias = '', $params = array());
+	
+	/**
+	 * Default compare function used by usort(). 
+	 */
+	abstract protected function compareObject( $a, $b );
+	
 	function build(&$view) {
 		
 		$this->view = $view;
@@ -37,15 +49,7 @@ class views_plugin_file_views_query extends views_plugin_query {
 		// Let the pager modify the query to add limits.
 		$this->pager->pre_execute($this);
 
-		usort( $result,
-			function( $a, $b ) {
-				return ( $a->file_views_name == $b->file_views_name 
-						? 0
-						: ( $a->file_views_name < $b->file_views_name 
-							? -1 : 1 ) 
-				);
-			} 
-		);
+		usort( $result, array( $this, "compareObject" ) );
 
 		$view->result = array_slice($result, $this->offset, ( 0 == $this->limit ? null : $this->limit ) );
 
@@ -56,6 +60,10 @@ class views_plugin_file_views_query extends views_plugin_query {
 		}
 		
 	}
+	
+}
+
+class views_plugin_file_views_query extends views_plugin_external_query {
 	
 	protected function getResults() {
 		
@@ -92,53 +100,17 @@ class views_plugin_file_views_query extends views_plugin_query {
 			return array();
 
 	}
-	
-	function add_field($table, $field, $alias = '', $params = array()) {
+
+	protected function add_field($table, $field, $alias = '', $params = array()) {
 		return 'file_views_'.$field;
 	}
-
-	function add_signature(&$view) {}
-
-	function get_aggregation_info() {}
-
-	function options_form(&$form, &$form_state) {
-		parent::options_form($form, $form_state);
+	
+	protected function compareObject( $a, $b ) {
+		return ( $a->file_views_name == $b->file_views_name 
+				? 0
+				: ( $a->file_views_name < $b->file_views_name 
+					? -1 : 1 ) 
+		);
 	}
-
-	function options_validate(&$form, &$form_state) {}
-
-	function options_submit(&$form, &$form_state) {}
-
-	function summary_title() {
-		return t('Settings');
-	}
-
-	function set_limit($limit) {
-		$this->limit = $limit;
-	}
-
-	function set_offset($offset) {
-		$this->offset = $offset;
-	}
-
-	function render_pager($exposed_input) {
-		if (!empty($this->pager) && $this->pager->use_pager()) {
-			return $this->pager->render($exposed_input);
-		}
-
-		return '';
-	}
-
-	function set_where_group($type = 'AND', $group = NULL, $where = 'where') {
-		return $group;
-	}
-
-	function set_group_operator($type = 'AND') {
-		$this->group_operator = strtoupper($type);
-	}
-
-	function get_result_entities($results, $relationship = NULL) {
-		return FALSE;
-	}
-
+	
 }
