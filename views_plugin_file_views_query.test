@@ -1,0 +1,174 @@
+<?php
+
+require_once dirname(__FILE__).'/views_plugin_file_views_query.inc';
+require_once drupal_get_path('module', 'views_ui').'/includes/view.inc';
+
+class views_plugin_file_views_query_test extends DrupalUnitTestCase {
+
+	function getInfo() {
+		return array(
+			'name' => 'views_plugin_file_views_query class unit test',
+			'description' => 'views_plugin_file_views_query class unit test.',
+			'group' => 'file_views',
+		);
+	}
+	
+	function testBuild() {
+		
+		$query = new views_plugin_file_views_query;
+		
+		$views = new Mock_views_for_testBuild( new Mock_pager_for_testBuild );
+		$views->query = $query;
+		
+		$query->build($views);
+		
+		//	views_plugin_query::$view must be set.
+		$this->assert( $views == $query->view );
+		
+		//	views_plugin_query::init_pager() should be called.
+		//	views_plugin_pager::query() should be called.
+		$this->assert( $views->verify() );
+		
+	}
+		
+	function testExecute() {
+		
+		$OFFSET = 1;
+		$LIMIT = 2;
+		
+		$RESULTS = array(
+			(Object)array( "file_views_name" => "bbb" ),
+			(Object)array( "file_views_name" => "aaa" ),
+			(Object)array( "file_views_name" => "ddd" ),
+			(Object)array( "file_views_name" => "ccc" ),
+		);
+		
+		$PAGER = new Mock_pager_for_testExecute;
+		
+		$query = new Mock_views_plugin_file_views_query_for_testExecute( 
+			$RESULTS,
+			$OFFSET,
+			$LIMIT
+		);
+		
+		$VIEW = new Mock_views_for_testExecute( $query, $PAGER );
+
+		$query->execute( $VIEW );
+		
+		//	$query->pager->get_total_items() returns results count.
+		$this->assertEqual( $LIMIT, count( $VIEW->result ) );
+		
+		//	$query->pager->update_page_info()
+		//	$query->pager->pre_execute()
+		//	$query->pager->post_execute()
+		//	should be called, accoding to the above alignment.
+		$this->assert( $PAGER->verify() );
+		
+		//	$view->result is sorted by file_views_name property.
+		//	$view->result is sliced by $query->offset and $query->limit.
+		$this->assertEqual( $LIMIT, count( $VIEW->result ) );
+		$this->assertEqual( $RESULTS[0], $VIEW->result[0] );
+		$this->assertEqual( $RESULTS[3], $VIEW->result[1] );
+		
+		//	when $query->limit is 0, $view->result is sliced from $query->offset to the end.
+		
+	}
+
+}
+
+class Mock_views_for_testBuild extends view {
+	
+	var $processed = array();
+	
+	var $mockPager;
+	
+	function __construct( $mockPager ) {
+		$this->mockPager = $mockPager;
+	}
+	
+	function init_pager() {
+		$this->query->pager = $this->mockPager;
+		$this->processed[] = 'init_pager';
+	}
+	
+	function verify() {
+		
+		//	views_plugin_query::init_pager() should be called.
+		return ( 'init_pager' == $this->processed[0]
+		and $this->query->pager->verify() );
+		
+	}
+	
+}
+
+class Mock_pager_for_testBuild extends views_plugin_pager {
+	
+	var $processed = array();
+	
+	function query() {
+		//	views_plugin_pager::query() should be called.
+		$this->processed[] = 'query';
+	}
+	
+	function verify() {
+		
+		return ( 'query' == $this->processed[0] );
+		
+	}
+	
+}
+
+class Mock_views_plugin_file_views_query_for_testExecute extends views_plugin_file_views_query {
+
+	var $results;
+	
+	function __construct( $results, $offset, $limit ) {
+		$this->results = $results;
+		$this->set_offset($offset);
+		$this->set_limit($limit);
+	}
+	
+	protected function getResults() {
+		return $this->results;
+	}
+	
+}
+
+class Mock_views_for_testExecute extends view {
+	
+	var $processed = array();
+	
+	var $mockPager;
+	
+	function __construct( $query, $mockPager ) {
+		$this->query = $query;
+		$this->query->pager = $mockPager;
+	}
+	
+}
+
+class Mock_pager_for_testExecute extends views_plugin_pager {
+	
+	var $processed = array();
+	
+	function update_page_info() {
+		$this->processed[] = 'update_page_info';
+	}
+	
+	function pre_execute() {
+		$this->processed[] = 'pre_execute';
+	}
+	
+	function post_execute() {
+		$this->processed[] = 'post_execute';
+	}
+	
+	function verify() {
+		
+		return ( 'update_page_info' == $this->processed[0]
+				and 'pre_execute' == $this->processed[1] 
+				and 'post_execute' == $this->processed[2] );
+		
+	}
+	
+}

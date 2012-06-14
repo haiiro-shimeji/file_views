@@ -15,27 +15,51 @@ class views_plugin_file_views_query extends views_plugin_query {
 
 	function build(&$view) {
 		
-		// Make the query distinct if the option was set.
-		if (!empty($this->options['distinct'])) {
-		$this->set_distinct();
-		}
-
-		// Store the view in the object to be able to use it later.
 		$this->view = $view;
 
 		$view->init_pager();
 
-		// Let the pager modify the query to add limits.
 		$this->pager->query();
 
-		$view->build_info['query'] = $this->query();
-		$view->build_info['count_query'] = $this->query(TRUE);
-		
 	}
 
 	function execute(&$view) {
 		
-		if ( $root_dir = preg_replace( '%/$%', '', variable_get('file_views_path', '') ) ) {
+		$result = $this->getResults();
+
+		$this->pager->total_items = count($result);
+		if (!empty($this->pager->options['offset'])) {
+			$this->pager->total_items -= $this->offset;
+		}
+
+		$this->pager->update_page_info();
+
+		// Let the pager modify the query to add limits.
+		$this->pager->pre_execute($this);
+
+		usort( $result,
+			function( $a, $b ) {
+				return ( $a->file_views_name == $b->file_views_name 
+						? 0
+						: ( $a->file_views_name < $b->file_views_name 
+							? -1 : 1 ) 
+				);
+			} 
+		);
+
+		$view->result = array_slice($result, $this->offset, ( 0 == $this->limit ? null : $this->limit ) );
+
+		$this->pager->post_execute($view->result);
+
+		if ($this->pager->use_pager()) {
+		$view->total_rows = $this->pager->get_total_items();
+		}
+		
+	}
+	
+	protected function getResults() {
+		
+		if ( ( $root_dir = preg_replace( '%/$%', '', variable_get('file_views_path', '') ) ) ) {
 		
 			$result = array();
 
@@ -60,37 +84,13 @@ class views_plugin_file_views_query extends views_plugin_query {
 				}
 
 			}
+			
+			return $result;
+			
+		} else 
+			
+			return array();
 
-			$this->pager->total_items = count($result);
-			if (!empty($this->pager->options['offset'])) {
-				$this->pager->total_items -= $this->offset;
-			}
-			
-		    $this->pager->update_page_info();
-			
-			// Let the pager modify the query to add limits.
-			$this->pager->pre_execute($query);
-
-			$view->result = array_slice($result, $this->offset, ( 0 == $this->limit ? null : $this->limit ) );
-			
-			usort( $view->result,
-				function( $a, $b ) {
-					return ( $a->file_views_name == $b->file_views_name 
-							? 0
-							: ( $a->file_views_name < $b->file_views_name 
-								? -1 : 1 ) 
-					);
-				} 
-			);
-			
-			$this->pager->post_execute($view->result);
-
-			if ($this->pager->use_pager()) {
-			$view->total_rows = $this->pager->get_total_items();
-			}
-			
-		}
-		
 	}
 	
 	function add_field($table, $field, $alias = '', $params = array()) {
