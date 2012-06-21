@@ -5,3 +5,4 @@ version = 7.x-0.x
 core = 7.x
 files[] = views_plugin_file_views_query.test
 files[] = views_plugin_file_views_query.inc
+files[] = views_plugin_external_query.inc
